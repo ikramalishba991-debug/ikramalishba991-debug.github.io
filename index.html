@@ -368,67 +368,66 @@
                     </div>
                 </div>
                 
-                <!-- Contact Form (Placeholder) -->
-               <!-- Make sure you have method="POST" -->
-<form action="https://api.web3forms.com/submit" method="POST" class="text-left">
+                <!-- Contact Form -->
+                <form action="https://api.web3forms.com/submit" method="POST" class="text-left reveal">
 
-  <!-- This is your secret key from Web3Forms -->
-  <input type="hidden" name="access_key" value="a012fe5e-9eb5-40f8-8ee8-0f082c6cc28b">
+                  <!-- This is your secret key from Web3Forms -->
+                  <input type="hidden" name="access_key" value="a012fe5e-9eb5-40f8-8ee8-0f082c6cc28b">
 
-  <!-- 1. Name Field Group -->
-  <!-- This div stacks the name field -->
-  <div class="mb-6">
-    <label for="name" class="block text-sm font-mono text-primary mb-2">Name</label>
-    <input 
-      type="text" 
-      id="name" 
-      name="Name" 
-      placeholder="Your Name"
-      class="w-full bg-dark-800 border border-dark-700 rounded-md py-3 px-4 text-light-100 focus:outline-none focus:ring-2 focus:ring-primary" 
-      required 
-    />
-  </div>
+                  <!-- 1. Name Field Group -->
+                  <!-- This div stacks the name field -->
+                  <div class="mb-6">
+                    <label for="name" class="block text-sm font-mono text-primary mb-2">Name</label>
+                    <input 
+                      type="text" 
+                      id="name" 
+                      name="Name" 
+                      placeholder="Your Name"
+                      class="w-full bg-dark-800 border border-dark-800 rounded-md py-3 px-4 text-light-100 focus:outline-none focus:ring-2 focus:ring-primary" 
+                      required 
+                    />
+                  </div>
 
-  <!-- 2. Email Field Group -->
-  <!-- This div stacks the email field -->
-  <div class="mb-6">
-    <label for="email" class="block text-sm font-mono text-primary mb-2">Email</label>
-    <input 
-      type="email" 
-      id="email" 
-      name="Email" 
-      placeholder="your.email@example.com"
-      class="w-full bg-dark-800 border border-dark-700 rounded-md py-3 px-4 text-light-100 focus:outline-none focus:ring-2 focus:ring-primary" 
-      required 
-    />
-  </div>
+                  <!-- 2. Email Field Group -->
+                  <!-- This div stacks the email field -->
+                  <div class="mb-6">
+                    <label for="email" class="block text-sm font-mono text-primary mb-2">Email</label>
+                    <input 
+                      type="email" 
+                      id="email" 
+                      name="Email" 
+                      placeholder="your.email@example.com"
+                      class="w-full bg-dark-800 border border-dark-800 rounded-md py-3 px-4 text-light-100 focus:outline-none focus:ring-2 focus:ring-primary" 
+                      required 
+                    />
+                  </div>
 
-  <!-- 3. Message Field Group -->
-  <!-- This div stacks the message field -->
-  <div class="mb-6">
-    <label for="message" class="block text-sm font-mono text-primary mb-2">Message</label>
-    <textarea 
-      id="message" 
-      name="Message" 
-      rows="5" 
-      placeholder="Your message..."
-      class="w-full bg-dark-800 border border-dark-700 rounded-md py-3 px-4 text-light-100 focus:outline-none focus:ring-2 focus:ring-primary" 
-      required
-    ></textarea>
-  </div>
+                  <!-- 3. Message Field Group -->
+                  <!-- This div stacks the message field -->
+                  <div class="mb-6">
+                    <label for="message" class="block text-sm font-mono text-primary mb-2">Message</label>
+                    <textarea 
+                      id="message" 
+                      name="Message" 
+                      rows="5" 
+                      placeholder="Your message..."
+                      class="w-full bg-dark-800 border border-dark-800 rounded-md py-3 px-4 text-light-100 focus:outline-none focus:ring-2 focus:ring-primary" 
+                      required
+                    ></textarea>
+                  </div>
 
-  <!-- 4. Submit Button Group -->
-  <!-- This div centers the button -->
-  <div class="text-center">
-    <button 
-      type="submit" 
-      class="font-mono text-primary border-2 border-primary text-lg px-8 py-4 rounded-md hover:bg-primary hover:bg-opacity-10 transition duration-300"
-    >
-      Send Message
-    </button>
-  </div>
+                  <!-- 4. Submit Button Group -->
+                  <!-- This div centers the button -->
+                  <div class="text-center">
+                    <button 
+                      type="submit" 
+                      class="font-mono text-primary border-2 border-primary text-lg px-8 py-4 rounded-md hover:bg-primary hover:bg-opacity-10 transition duration-300"
+                    >
+                      Send Message
+                    </button>
+                  </div>
 
-</form>
+                </form>
             </div>
         </section>
 
@@ -470,7 +469,9 @@
                     charIndex++;
                 }
 
-                typingText.textContent = displayText;
+                if (typingText) {
+                  typingText.textContent = displayText;
+                }
 
                 let typeSpeed = isDeleting ? 75 : 150;
 
@@ -487,35 +488,40 @@
 
                 setTimeout(type, typeSpeed);
             }
-            type();
+            // Only run typing animation if the element exists
+            if (typingText) {
+              type();
+            }
 
             // --- Mobile Menu Toggle ---
             const menuBtn = document.getElementById('mobile-menu-btn');
             const mobileMenu = document.getElementById('mobile-menu');
-            const menuIcon = menuBtn.querySelector('i');
+            const menuIcon = menuBtn ? menuBtn.querySelector('i') : null;
 
-            menuBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-                mobileMenu.classList.toggle('flex');
-                
-                if (mobileMenu.classList.contains('hidden')) {
-                    menuIcon.classList.remove('bx-x');
-                    menuIcon.classList.add('bx-menu');
-                } else {
-                    menuIcon.classList.remove('bx-menu');
-                    menuIcon.classList.add('bx-x');
-                }
-            });
-            
-            // Close mobile menu when a link is clicked
-            mobileMenu.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileMenu.classList.add('hidden');
-                    mobileMenu.classList.remove('flex');
-                    menuIcon.classList.remove('bx-x');
-                    menuIcon.classList.add('bx-menu');
-                });
-            });
+            if (menuBtn && mobileMenu && menuIcon) {
+              menuBtn.addEventListener('click', () => {
+                  mobileMenu.classList.toggle('hidden');
+                  mobileMenu.classList.toggle('flex');
+                  
+                  if (mobileMenu.classList.contains('hidden')) {
+                      menuIcon.classList.remove('bx-x');
+                      menuIcon.classList.add('bx-menu');
+                  } else {
+                      menuIcon.classList.remove('bx-menu');
+                      menuIcon.classList.add('bx-x');
+                  }
+              });
+              
+              // Close mobile menu when a link is clicked
+              mobileMenu.querySelectorAll('a').forEach(link => {
+                  link.addEventListener('click', () => {
+                      mobileMenu.classList.add('hidden');
+                      mobileMenu.classList.remove('flex');
+                      menuIcon.classList.remove('bx-x');
+                      menuIcon.classList.add('bx-menu');
+                  });
+              });
+            }
 
             // --- Scroll Animations ---
             const revealElements = document.querySelectorAll('.reveal');
@@ -536,34 +542,28 @@
             const sections = document.querySelectorAll('section');
             const navLinks = document.querySelectorAll('.nav-link');
 
-            window.addEventListener('scroll', () => {
-                let current = '';
-                sections.forEach(section => {
-                    const sectionTop = section.offsetTop;
-                    // 81px is header height + 1px
-                    if (pageYOffset >= sectionTop - 81) { 
-                        current = section.getAttribute('id');
-                    }
-                });
+            if (sections.length > 0 && navLinks.length > 0) {
+              window.addEventListener('scroll', () => {
+                  let current = '';
+                  sections.forEach(section => {
+                      const sectionTop = section.offsetTop;
+                      // 81px is header height + 1px
+                      if (pageYOffset >= sectionTop - 81) { 
+                          current = section.getAttribute('id');
+                      }
+                  });
 
-                navLinks.forEach(link => {
-                    link.classList.remove('nav-active');
-                    if (link.getAttribute('href') === `#${current}`) {
-                        link.classList.add('nav-active');
-                    }
-                });
-            });
+                  navLinks.forEach(link => {
+                      link.classList.remove('nav-active');
+                      if (link.getAttribute('href') === `#${current}`) {
+                          link.classList.add('nav-active');
+                      }
+                  });
+              });
+            }
 
         });
     </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
