@@ -14,7 +14,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     
-    <!-- Configuration for Tailwind -->
     <script>
         tailwind.config = {
             theme: {
@@ -31,16 +30,6 @@
                         sans: ['Inter', 'sans-serif'],
                         mono: ['"Fira Code"', 'monospace'],
                     },
-                    animation: {
-                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    },
-                    keyframes: {
-                        fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                    }
                 }
             }
         }
@@ -48,6 +37,11 @@
     
     <style>
         body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; border: 2px solid #0f172a; }
+        ::-webkit-scrollbar-thumb:hover { background: #64ffda; }
+
         .typing-cursor {
             display: inline-block;
             width: 3px;
@@ -59,22 +53,15 @@
             top: 0.15em;
         }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
         .reveal {
             opacity: 0;
             transform: translateY(30px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-            will-change: opacity, transform;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .reveal.visible { opacity: 1; transform: translateY(0); }
         .nav-active { color: #64ffda !important; font-weight: 600; }
-        .nav-active::after {
-            content: '';
-            display: block;
-            width: 100%;
-            height: 2px;
-            background: #64ffda;
-            transform: scaleX(1);
-        }
+        
         .timeline-item::before {
             content: '';
             position: absolute;
@@ -87,322 +74,253 @@
             border-radius: 50%;
             z-index: 1;
         }
+
+        .carousel-item {
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            position: absolute;
+            inset: 0;
+        }
+        .carousel-item.active {
+            opacity: 1;
+            position: relative;
+        }
     </style>
 </head>
 
-<body class="bg-dark-900 text-light-200 leading-relaxed">
+<body class="bg-dark-900 text-light-200 leading-relaxed overflow-x-hidden">
 
-    <!-- Header & Navigation -->
-    <header class="bg-dark-900/80 backdrop-blur-md sticky top-0 z-50 transition-all duration-300">
+    <header class="bg-dark-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-primary/5">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="text-2xl font-bold text-white tracking-tight">
-                Alishba <span class="text-primary">Ikram</span>
+            <a href="#" class="text-2xl font-bold text-white tracking-tight group">
+                Alishba <span class="text-primary group-hover:drop-shadow-[0_0_8px_rgba(100,255,218,0.5)] transition-all">Ikram</span>
             </a>
-            
-            <button id="mobile-menu-btn" class="md:hidden text-3xl text-light-100 z-50">
-                <i class='bx bx-menu'></i>
-            </button>
-
-            <div id="desktop-nav" class="hidden md:flex space-x-8">
-                <a href="#about" class="text-light-200 hover:text-primary transition duration-300 nav-link">About</a>
-                <a href="#skills" class="text-light-200 hover:text-primary transition duration-300 nav-link">Skills</a>
-                <a href="#projects" class="text-light-200 hover:text-primary transition duration-300 nav-link">Projects</a>
-                <a href="#experience" class="text-light-200 hover:text-primary transition duration-300 nav-link">Experience</a>
-                <a href="#contact" class="text-light-200 hover:text-primary transition duration-300 nav-link">Contact</a>
-            </div>
-            
-            <div id="mobile-menu" class="fixed inset-0 bg-dark-900 z-40 flex-col items-center justify-center space-y-8 text-2xl hidden">
-                <a href="#about" class="text-light-200 hover:text-primary transition duration-300 nav-link">About</a>
-                <a href="#skills" class="text-light-200 hover:text-primary transition duration-300 nav-link">Skills</a>
-                <a href="#projects" class="text-light-200 hover:text-primary transition duration-300 nav-link">Projects</a>
-                <a href="#experience" class="text-light-200 hover:text-primary transition duration-300 nav-link">Experience</a>
-                <a href="#contact" class="text-light-200 hover:text-primary transition duration-300 nav-link">Contact</a>
+            <button id="mobile-menu-btn" class="md:hidden text-3xl text-light-100"><i class='bx bx-menu'></i></button>
+            <div class="hidden md:flex space-x-8">
+                <a href="#about" class="text-light-200 hover:text-primary transition font-mono text-sm nav-link">01. About</a>
+                <a href="#skills" class="text-light-200 hover:text-primary transition font-mono text-sm nav-link">02. Skills</a>
+                <a href="#projects" class="text-light-200 hover:text-primary transition font-mono text-sm nav-link">03. Projects</a>
+                <a href="#experience" class="text-light-200 hover:text-primary transition font-mono text-sm nav-link">04. Journey</a>
+                <a href="#contact" class="text-light-200 hover:text-primary transition font-mono text-sm nav-link">05. Contact</a>
             </div>
         </nav>
     </header>
 
     <main class="container mx-auto px-6">
 
-        <!-- Section 1: Hero -->
-        <section id="about" class="min-h-[calc(100vh-80px)] flex items-center justify-center text-center md:text-left">
-            <div class="max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-                <div class="md:col-span-2">
-                    <span class="text-primary font-mono">Hi, my name is</span>
-                    <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold text-light-100 my-4">Alishba Ikram.</h1>
-                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-light-300">
-                        I build <span id="typing-text" class="text-primary"></span><span class="typing-cursor"></span>
+        <!-- Hero Section -->
+        <section id="about" class="min-h-[calc(100vh-80px)] flex items-center justify-center">
+            <div class="max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-12 items-center">
+                <div class="md:col-span-2 reveal">
+                    <span class="text-primary font-mono tracking-widest block mb-4">Software Developer & Bioinformatician</span>
+                    <h1 class="text-5xl sm:text-7xl font-bold text-light-100 leading-tight">Alishba Ikram.</h1>
+                    <h2 class="text-3xl sm:text-5xl font-bold text-light-300 mt-2">
+                        Engineering <span id="typing-text" class="text-primary"></span><span class="typing-cursor"></span>
                     </h2>
-                    <p class="text-light-200 max-w-2xl mt-6 text-lg">
-                        Aspiring bioinformatics professional specializing in computational biology and AI-driven diagnostics. I develop scalable pipelines to translate complex biological data into actionable clinical and agricultural insights.
+                    <p class="text-light-300 max-w-2xl mt-8 text-lg leading-relaxed">
+                        I specialize in creating high-performance tools for genetic discovery and precision agriculture. My work integrates clinical bioinformatics with modern AI to solve real-world scalability challenges.
                     </p>
-                    <div class="mt-8 flex justify-center md:justify-start gap-4">
-                        <a href="#projects" class="px-6 py-3 bg-primary text-dark-900 font-bold rounded-md hover:bg-opacity-80 transition duration-300">
-                            View My Projects
-                        </a>
-                        <a href="mailto:ikramalishba991@gmail.com" class="px-6 py-3 bg-dark-800 text-primary font-bold rounded-md hover:bg-opacity-80 transition duration-300 border border-primary">
-                            Contact Me
-                        </a>
+                    <div class="mt-10 flex flex-wrap gap-4">
+                        <a href="#projects" class="px-8 py-4 bg-transparent border-2 border-primary text-primary font-bold rounded hover:bg-primary/10 transition-all">View Projects</a>
+                        <a href="mailto:ikramalishba991@gmail.com" class="px-8 py-4 bg-primary text-dark-900 font-bold rounded hover:translate-y-[-2px] transition-all shadow-lg shadow-primary/20">Contact Me</a>
                     </div>
                 </div>
-                <div class="flex justify-center md:col-span-1">
-                    <div class="w-64 h-64 sm:w-80 sm:h-80 rounded-full border-4 border-primary/50 overflow-hidden shadow-2xl shadow-primary/10">
-                        <!-- Update: Use a real image if available or a themed placeholder -->
-                        <img src="https://placehold.co/320x320/1e293b/64ffda?text=Alishba+Ikram&font=inter" 
-                             alt="Alishba Ikram"
-                             class="w-full h-full object-cover">
+                <div class="flex justify-center md:col-span-1 reveal">
+                    <div class="relative w-64 h-64 sm:w-80 sm:h-80 rounded-lg overflow-hidden border-2 border-primary/20 bg-dark-800">
+                        <img src="https://placehold.co/400x400/1e293b/64ffda?text=Alishba+Ikram&font=inter" alt="Profile" class="w-full h-full object-cover">
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Section 2: Skills -->
-        <section id="skills" class="py-20 lg:py-32 reveal">
-            <h2 class="text-3xl md:text-4xl font-bold text-center text-light-100 mb-12">
-                My Technical <span class="text-primary">Skillset</span>
-            </h2>
+        <!-- Skills Section -->
+        <section id="skills" class="py-24 reveal">
+            <div class="flex items-center mb-12">
+                <h2 class="text-3xl font-bold text-light-100"><span class="text-primary font-mono mr-2">02.</span> Technical Arsenal</h2>
+                <div class="h-[1px] bg-dark-800 flex-grow ml-6"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
+                <div class="p-8 rounded-xl bg-dark-800/50 border border-white/5 hover:border-primary/30 transition-all">
+                    <h3 class="text-xl font-bold text-light-100 mb-4">Genomics & AI</h3>
+                    <ul class="text-light-300 space-y-2 font-mono">
+                        <li><i class='bx bx-chevron-right text-primary'></i> Conv1D Neural Networks</li>
+                        <li><i class='bx bx-chevron-right text-primary'></i> K-mer Matching Engine</li>
+                        <li><i class='bx bx-chevron-right text-primary'></i> ClinVar VCF Analysis</li>
+                        <li><i class='bx bx-chevron-right text-primary'></i> BWA Aligner Integration</li>
+                    </ul>
+                </div>
+                <div class="p-8 rounded-xl bg-dark-800/50 border border-white/5 hover:border-primary/30 transition-all">
+                    <h3 class="text-xl font-bold text-light-100 mb-4">Web Development</h3>
+                    <ul class="text-light-300 space-y-2 font-mono">
+                        <li><i class='bx bx-chevron-right text-primary'></i> PHP / MySQL / Apache</li>
+                        <li><i class='bx bx-chevron-right text-primary'></i> Python / Flask / Streamlit</li>
+                        <li><i class='bx bx-chevron-right text-primary'></i> Tailwind CSS & HTML5</li>
+                        <li><i class='bx bx-chevron-right text-primary'></i> RESTful API Design</li>
+                    </ul>
+                </div>
+                <div class="p-8 rounded-xl bg-dark-800/50 border border-white/5 hover:border-primary/30 transition-all">
+                    <h3 class="text-xl font-bold text-light-100 mb-4">AgriTech Systems</h3>
+                    <ul class="text-light-300 space-y-2 font-mono">
+                        <li><i class='bx bx-chevron-right text-primary'></i> Weather Data Pipelines</li>
+                        <li><i class='bx bx-chevron-right text-primary'></i> Soil Thermal Modeling</li>
+                        <li><i class='bx bx-chevron-right text-primary'></i> Predictive Yield Analysis</li>
+                        <li><i class='bx bx-chevron-right text-primary'></i> SMS Alert Engineering</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="py-24">
+            <div class="flex items-center mb-16">
+                <h2 class="text-3xl font-bold text-light-100"><span class="text-primary font-mono mr-2">03.</span> Impactful Work</h2>
+                <div class="h-[1px] bg-dark-800 flex-grow ml-6"></div>
+            </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-dark-800 p-6 rounded-lg shadow-lg hover:shadow-primary/10 transition-shadow duration-300">
-                    <div class="flex items-center mb-4">
-                        <i class='bx bx-brain text-primary text-4xl mr-4'></i>
-                        <h3 class="text-2xl font-bold text-light-100">AI & Machine Learning</h3>
+            <div class="space-y-32">
+                <!-- Project 1: Gene-ius Hub (Carousel) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center reveal">
+                    <div class="lg:col-span-7 relative group">
+                        <div class="absolute -inset-2 bg-primary/10 rounded-lg"></div>
+                        <div class="relative rounded-lg overflow-hidden border border-primary/20 bg-dark-800 shadow-2xl min-h-[400px]">
+                            <div id="genetics-carousel" class="relative w-full h-full">
+                                <div class="carousel-item active"><img src="mutation analysis app.png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="mutation analysis app 1.png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="mutation analysis app 2.png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="mutation analysis app 3.png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="mutation analysis app 4.png" class="w-full h-full object-cover"></div>
+                            </div>
+                            <div class="absolute top-4 left-4 bg-dark-900/80 px-4 py-2 rounded border border-primary text-xs font-mono text-primary">
+                                Genetics Feature: <span id="genetics-label">Main Dashboard</span>
+                            </div>
+                        </div>
                     </div>
-                    <p class="text-light-300 mb-4">Designing Conv1D and predictive models for sequence classification and yield forecasting.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="bg-dark-900 text-primary text-sm font-mono px-3 py-1 rounded-full">Python</span>
-                        <span class="bg-dark-900 text-primary text-sm font-mono px-3 py-1 rounded-full">TensorFlow</span>
-                        <span class="bg-dark-900 text-primary text-sm font-mono px-3 py-1 rounded-full">Keras</span>
-                        <span class="bg-dark-900 text-primary text-sm font-mono px-3 py-1 rounded-full">Scikit-learn</span>
+                    <div class="lg:col-span-5">
+                        <p class="text-primary font-mono text-sm mb-2">Genomics & AI</p>
+                        <h3 class="text-2xl font-bold text-light-100 mb-6">Gene-ius Hub: Pathogenicity Pipeline</h3>
+                        <div class="p-6 bg-dark-800 rounded-lg border border-white/5 mb-6 text-light-300">
+                            <p class="mb-4"><strong>Problem:</strong> Massive DNA sequence storage makes clinical diagnosis slow and expensive.</p>
+                            <p><strong>Solution:</strong> A high-speed pipeline using <strong>K-mer Indexing</strong> and <strong>Conv1D AI</strong> to classify variations instantly from short DNA snippets.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-4 text-xs font-mono text-primary">
+                            <span>Python (AI)</span><span>PHP/BWA</span><span>K-mer Engine</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="bg-dark-800 p-6 rounded-lg shadow-lg hover:shadow-primary/10 transition-shadow duration-300">
-                    <div class="flex items-center mb-4">
-                        <i class='bx bx-dna text-primary text-4xl mr-4'></i>
-                        <h3 class="text-2xl font-bold text-light-100">Bioinformatics</h3>
+                <!-- Project 2: Smart Crop (Carousel) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center reveal">
+                    <div class="lg:col-span-5 order-2 lg:order-1">
+                        <p class="text-primary font-mono text-sm mb-2">Precision Agriculture</p>
+                        <h3 class="text-2xl font-bold text-light-100 mb-6">AI Agricultural Analysis System</h3>
+                        <div class="p-6 bg-dark-800 rounded-lg border border-white/5 mb-6 text-light-300">
+                            <p class="mb-4"><strong>Problem:</strong> Fragmented agricultural data leads to poor crop rotation and high resource waste.</p>
+                            <p><strong>Solution:</strong> Integrated system for <strong>Weather Forecasting</strong>, <strong>Soil Thermal Analysis</strong>, and <strong>Multi-Crop Comparison</strong> to optimize yield.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-4 text-xs font-mono text-primary">
+                            <span>Streamlit</span><span>Weather APIs</span><span>Predictive Yield</span>
+                        </div>
                     </div>
-                    <p class="text-light-300 mb-4">Handling high-throughput sequencing data through K-mer indexing and BWA alignment.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="bg-dark-900 text-primary text-sm font-mono px-3 py-1 rounded-full">BWA Aligner</span>
-                        <span class="bg-dark-900 text-primary text-sm font-mono px-3 py-1 rounded-full">K-mer Analysis</span>
-                        <span class="bg-dark-900 text-primary text-sm font-mono px-3 py-1 rounded-full">SAM/VCF</span>
-                        <span class="bg-dark-900 text-primary text-sm font-mono px-3 py-1 rounded-full">ClinVar</span>
-                    </div>
-                </div>
-
-                <div class="bg-dark-800 p-6 rounded-lg shadow-lg hover:shadow-primary/10 transition-shadow duration-300">
-                    <div class="flex items-center mb-4">
-                        <i class='bx bxs-data text-primary text-4xl mr-4'></i>
-                        <h3 class="text-2xl font-bold text-light-100">Backend & Web</h3>
-                    </div>
-                    <p class="text-light-300 mb-4">Engineering integrated web systems using PHP, Flask, and relational databases.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="bg-dark-900 text-primary text-sm font-mono px-3 py-1 rounded-full">PHP</span>
-                        <span class="bg-dark-900 text-primary text-sm font-mono px-3 py-1 rounded-full">MySQL</span>
-                        <span class="bg-dark-900 text-primary text-sm font-mono px-3 py-1 rounded-full">Flask</span>
-                        <span class="bg-dark-900 text-primary text-sm font-mono px-3 py-1 rounded-full">Streamlit</span>
+                    <div class="lg:col-span-7 relative group order-1 lg:order-2">
+                        <div class="absolute -inset-2 bg-primary/10 rounded-lg"></div>
+                        <div class="relative rounded-lg overflow-hidden border border-primary/20 bg-dark-800 shadow-2xl min-h-[400px]">
+                            <div id="crop-carousel" class="relative w-full h-full">
+                                <div class="carousel-item active"><img src="crop analysis app..png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="crop analysis app.1.png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="crop analysis app.2.png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="crop analysis app.3.png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="crop analysis app.4.png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="crop analysis app.5.png" class="w-full h-full object-cover"></div>
+                            </div>
+                            <div class="absolute top-4 right-4 bg-dark-900/80 px-4 py-2 rounded border border-primary text-xs font-mono text-primary">
+                                AgriTech Feature: <span id="crop-label">Weather Dashboard</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Section 3: Projects -->
-        <section id="projects" class="py-20 lg:py-32 reveal">
-            <h2 class="text-3xl md:text-4xl font-bold text-center text-light-100 mb-12">
-                Featured <span class="text-primary">Projects</span>
-            </h2>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <!-- Project 1: Genetic Analysis Pipeline -->
-                <div class="bg-dark-800 rounded-lg shadow-lg overflow-hidden flex flex-col hover:shadow-primary/10 transition-shadow duration-300 reveal group">
-                    <!-- Real Screenshot Reference -->
-                    <div class="overflow-hidden h-64 border-b border-dark-900">
-                        <img src="mutation analysis app.png" 
-                             alt="AI Pathogenicity Classifier Dashboard"
-                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                             onerror="this.onerror=null; this.src='https://placehold.co/600x300/1e293b/64ffda?text=Gene-ius+Hub+Dashboard';">
-                    </div>
-                    <div class="p-8 flex flex-col flex-grow">
-                        <div class="mb-4">
-                            <span class="text-primary font-mono text-sm uppercase tracking-widest">Bioinformatics</span>
-                            <h3 class="text-2xl font-bold text-light-100 mt-1">AI-Accelerated Pathogenicity Pipeline</h3>
-                        </div>
-                        
-                        <div class="space-y-4 mb-6 text-light-300">
-                            <p>
-                                <strong class="text-primary">The Problem:</strong> Traditional genetic analysis faces massive scalability bottlenecks. Storing and searching full gene sequences is slow and computationally expensive, hindering rapid clinical diagnosis from DNA snippets.
-                            </p>
-                            <p>
-                                <strong class="text-primary">The Solution:</strong> A hybrid system using <span class="text-light-100">K-mer Indexing</span> for sub-second gene identification and a <span class="text-light-100">Conv1D Neural Network</span> to instantly classify pathogenicity.
-                            </p>
-                            <p>
-                                <strong class="text-primary">The Impact:</strong> Bypasses the need for full-genome storage, providing a fast, intelligent, and scalable diagnostic tool that predicts clinical significance (Pathogenic/Benign) with high accuracy.
-                            </p>
-                        </div>
-
-                        <div class="flex flex-wrap gap-2 mt-auto">
-                            <span class="bg-dark-900 text-primary text-xs font-mono px-3 py-1 rounded-full">TensorFlow</span>
-                            <span class="bg-dark-900 text-primary text-xs font-mono px-3 py-1 rounded-full">PHP/BWA</span>
-                            <span class="bg-dark-900 text-primary text-xs font-mono px-3 py-1 rounded-full">K-mer Matching</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project 2: Smart Crop Management System -->
-                <div class="bg-dark-800 rounded-lg shadow-lg overflow-hidden flex flex-col hover:shadow-primary/10 transition-shadow duration-300 reveal group">
-                    <!-- Real Screenshot Reference -->
-                    <div class="overflow-hidden h-64 border-b border-dark-900">
-                        <img src="crop analysis app..png" 
-                             alt="Smart Crop System Dashboard"
-                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                             onerror="this.onerror=null; this.src='https://placehold.co/600x300/1e293b/64ffda?text=Smart+Crop+Dashboard';">
-                    </div>
-                    <div class="p-8 flex flex-col flex-grow">
-                        <div class="mb-4">
-                            <span class="text-primary font-mono text-sm uppercase tracking-widest">AgriTech</span>
-                            <h3 class="text-2xl font-bold text-light-100 mt-1">Smart Crop Management System (SCMS)</h3>
-                        </div>
-                        
-                        <div class="space-y-4 mb-6 text-light-300">
-                            <p>
-                                <strong class="text-primary">The Problem:</strong> Modern farmers struggle with complex multi-crop decisions. Most tools offer only single-crop analysis, failing to account for crop rotation, intercropping synergy, and volatile weather risks.
-                            </p>
-                            <p>
-                                <strong class="text-primary">The Solution:</strong> An AI-enhanced platform integrating <span class="text-light-100">Real-time Weather APIs</span> and <span class="text-light-100">Soil Databases</span> to run side-by-side comparative suitability analyses.
-                            </p>
-                            <p>
-                                <strong class="text-primary">The Impact:</strong> Empowers farmers with predictive yield models and risk mitigation strategies, leading to optimized resource use and significantly higher, more predictable agricultural yields.
-                            </p>
-                        </div>
-
-                        <div class="flex flex-wrap gap-2 mt-auto">
-                            <span class="bg-dark-900 text-primary text-xs font-mono px-3 py-1 rounded-full">Streamlit</span>
-                            <span class="bg-dark-900 text-primary text-xs font-mono px-3 py-1 rounded-full">Predictive Modeling</span>
-                            <span class="bg-dark-900 text-primary text-xs font-mono px-3 py-1 rounded-full">API Integration</span>
-                        </div>
-                    </div>
-                </div>
+        <!-- Journey Section -->
+        <section id="experience" class="py-24 reveal">
+            <div class="flex items-center mb-16">
+                <h2 class="text-3xl font-bold text-light-100"><span class="text-primary font-mono mr-2">04.</span> Educational Journey</h2>
+                <div class="h-[1px] bg-dark-800 flex-grow ml-6"></div>
             </div>
-        </section>
-        
-        <!-- Section 4: Experience & Education -->
-        <section id="experience" class="py-20 lg:py-32 reveal">
-            <h2 class="text-3xl md:text-4xl font-bold text-center text-light-100 mb-20">
-                My <span class="text-primary">Journey</span>
-            </h2>
-            
-            <div class="relative max-w-2xl mx-auto border-l-2 border-dark-800 pl-10">
+            <div class="relative max-w-3xl mx-auto border-l-2 border-dark-800 pl-10">
                 <div class="mb-12 relative timeline-item reveal">
                     <span class="text-sm font-mono text-primary">2024 - 2028</span>
                     <h3 class="text-2xl font-bold text-light-100 mt-1">BS Bioinformatics</h3>
-                    <p class="text-lg font-semibold text-light-300">GCU Faisalabad</p>
-                    <p class="text-light-300 mt-2">Specializing in the intersection of biological science and computational algorithms.</p>
+                    <p class="text-lg font-semibold text-light-300">Government College University Faisalabad</p>
+                    <p class="text-light-300 mt-2">Specializing in genomic data analysis, bioinformatics software architecture, and biotechnology AI.</p>
                 </div>
-
                 <div class="mb-12 relative timeline-item reveal">
                     <span class="text-sm font-mono text-primary">2025 - 2027</span>
-                    <h3 class="text-2xl font-bold text-light-100 mt-1">AD in DBMS</h3>
+                    <h3 class="text-2xl font-bold text-light-100 mt-1">Associate Degree in DBMS</h3>
                     <p class="text-lg font-semibold text-light-300">Virtual University</p>
-                    <p class="text-light-300 mt-2">Focusing on high-performance database management for large-scale genetic datasets.</p>
+                    <p class="text-light-300 mt-2">Focused on relational database modeling, big data warehousing, and efficient SQL engineering.</p>
                 </div>
-                
-                <div class="relative timeline-item reveal">
-                    <span class="text-sm font-mono text-primary">May 2023 - Sep 2023</span>
-                    <h3 class="text-2xl font-bold text-light-100 mt-1">Teacher</h3>
-                    <p class="text-lg font-semibold text-light-300">Superior School System</p>
-                    <p class="text-light-300 mt-2">Developed communication skills and adapted complex concepts for diverse learners.</p>
+                <div class="mb-12 relative timeline-item reveal">
+                    <span class="text-sm font-mono text-primary">2021 - 2023</span>
+                    <h3 class="text-2xl font-bold text-light-100 mt-1">Intermediate with Computer Science</h3>
+                    <p class="text-lg font-semibold text-light-300">BISE Faisalabad</p>
+                    <p class="text-light-300 mt-2">Rigorous training in software development lifecycle, logic building, and computer engineering foundations.</p>
                 </div>
             </div>
         </section>
 
-        <!-- Section 5: Contact -->
-        <section id="contact" class="py-20 lg:py-32 reveal">
-            <h2 class="text-3xl md:text-4xl font-bold text-center text-light-100 mb-12">
-                Get In <span class="text-primary">Touch</span>
-            </h2>
-            
-            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
-                <div class="reveal">
-                    <p class="text-lg text-light-200 mb-6">
-                        I am open to research collaborations and development opportunities in Bioinformatics and AI. Let's discuss how we can solve complex biological problems together.
-                    </p>
-                    <div class="space-y-4">
-                        <a href="mailto:ikramalishba991@gmail.com" class="flex items-center group">
-                            <i class='bx bxs-envelope text-primary text-3xl mr-4 group-hover:scale-110 transition-transform'></i>
-                            <span class="text-light-100 text-lg group-hover:text-primary transition-colors">ikramalishba991@gmail.com</span>
-                        </a>
-                        <div class="flex items-center">
-                            <i class='bx bxs-map text-primary text-3xl mr-4'></i>
-                            <span class="text-light-100 text-lg">Faisalabad, Pakistan</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <form action="https://api.web3forms.com/submit" method="POST" class="text-left reveal">
-                  <input type="hidden" name="access_key" value="a012fe5e-9eb5-40f8-8ee8-0f082c6cc28b">
-                  <div class="mb-6">
-                    <label for="name" class="block text-sm font-mono text-primary mb-2">Name</label>
-                    <input type="text" id="name" name="Name" class="w-full bg-dark-800 border border-dark-800 rounded-md py-3 px-4 text-light-100 focus:outline-none focus:ring-2 focus:ring-primary" required />
-                  </div>
-                  <div class="mb-6">
-                    <label for="email" class="block text-sm font-mono text-primary mb-2">Email</label>
-                    <input type="email" id="email" name="Email" class="w-full bg-dark-800 border border-dark-800 rounded-md py-3 px-4 text-light-100 focus:outline-none focus:ring-2 focus:ring-primary" required />
-                  </div>
-                  <div class="mb-6">
-                    <label for="message" class="block text-sm font-mono text-primary mb-2">Message</label>
-                    <textarea id="message" name="Message" rows="5" class="w-full bg-dark-800 border border-dark-800 rounded-md py-3 px-4 text-light-100 focus:outline-none focus:ring-2 focus:ring-primary" required></textarea>
-                  </div>
-                  <div class="text-center">
-                    <button type="submit" class="font-mono text-primary border-2 border-primary text-lg px-8 py-4 rounded-md hover:bg-primary hover:bg-opacity-10 transition duration-300">
-                      Send Message
-                    </button>
-                  </div>
-                </form>
-            </div>
+        <!-- Contact Section -->
+        <section id="contact" class="py-24 text-center reveal">
+            <h2 class="text-4xl font-bold text-light-100 mb-6">Let's Connect</h2>
+            <p class="text-light-300 max-w-lg mx-auto mb-10 text-lg">I am always open to discussing new research, innovative projects, or development opportunities in AI and Bioinformatics.</p>
+            <a href="mailto:ikramalishba991@gmail.com" class="font-mono text-primary border-2 border-primary text-lg px-12 py-5 rounded hover:bg-primary/10 transition-all inline-block">Say Hello</a>
         </section>
 
     </main>
 
-    <footer class="py-8 bg-dark-800">
-        <div class="container mx-auto px-6 text-center text-light-300">
-            <p>&copy; 2025 Alishba Ikram. Bioinformatics & AI Research Portfolio.</p>
-        </div>
+    <footer class="py-10 text-center border-t border-dark-800">
+        <p class="text-light-300 text-sm font-mono">Designed & Engineered by Alishba Ikram &copy; 2026</p>
     </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Typing Animation
             const typingText = document.getElementById('typing-text');
-            const titles = ["diagnostic AI models.", "bioinformatics tools.", "data-driven solutions."];
+            const titles = ["Precision AgriTech.", "Genomic Diagnostics.", "Smart Data Pipelines."];
             let titleIndex = 0, charIndex = 0, isDeleting = false;
 
             function type() {
                 const currentTitle = titles[titleIndex];
                 typingText.textContent = isDeleting ? currentTitle.substring(0, charIndex - 1) : currentTitle.substring(0, charIndex + 1);
                 charIndex = isDeleting ? charIndex - 1 : charIndex + 1;
-                let typeSpeed = isDeleting ? 50 : 100;
+                let typeSpeed = isDeleting ? 50 : 150;
                 if (!isDeleting && charIndex === currentTitle.length) { typeSpeed = 2000; isDeleting = true; }
                 else if (isDeleting && charIndex === 0) { isDeleting = false; titleIndex = (titleIndex + 1) % titles.length; typeSpeed = 500; }
                 setTimeout(type, typeSpeed);
             }
             if (typingText) type();
 
-            const menuBtn = document.getElementById('mobile-menu-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const menuIcon = menuBtn?.querySelector('i');
-            if (menuBtn && mobileMenu) {
-              menuBtn.addEventListener('click', () => {
-                  mobileMenu.classList.toggle('hidden');
-                  mobileMenu.classList.toggle('flex');
-                  menuIcon.classList.toggle('bx-menu');
-                  menuIcon.classList.toggle('bx-x');
-              });
+            // Carousel Logic
+            function initCarousel(containerId, labelId, labels) {
+                const items = document.querySelectorAll(`#${containerId} .carousel-item`);
+                const label = document.getElementById(labelId);
+                let current = 0;
+                setInterval(() => {
+                    items[current].classList.remove('active');
+                    current = (current + 1) % items.length;
+                    items[current].classList.add('active');
+                    if(label) label.textContent = labels[current];
+                }, 4000);
             }
 
-            const revealElements = document.querySelectorAll('.reveal');
+            initCarousel('genetics-carousel', 'genetics-label', ["Main Dashboard", "Mutation Records", "Gene Records", "Add New Mutation", "AI Analysis Report"]);
+            initCarousel('crop-carousel', 'crop-label', ["Weather Dashboard", "Temperature Forecast", "Soil Properties", "Compatibility Analysis", "Winter Risk Control", "Multi-Crop Analytics"]);
+
+            // Reveal on Scroll
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
             }, { threshold: 0.1 });
-            revealElements.forEach(el => observer.observe(el));
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         });
     </script>
 </body>
