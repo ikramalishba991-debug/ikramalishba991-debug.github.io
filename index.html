@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alishba Ikram | Bioinformatics Student Portfolio</title>
+    <title>Alishba Ikram | Student Portfolio</title>
     
     <!-- Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
@@ -20,9 +19,11 @@
             theme: {
                 extend: {
                     colors: {
-                        'accent': '#10b981', 
-                        'dark-bg': '#020617', 
-                        'dark-card': 'rgba(15, 23, 42, 0.6)', 
+                        'primary': '#10b981', 
+                        'dark-900': '#020617',
+                        'dark-800': '#0f172a',
+                        'light-100': '#f1f5f9',
+                        'light-200': '#e2e8f0',
                     },
                     fontFamily: {
                         sans: ['"Plus Jakarta Sans"', 'sans-serif'],
@@ -34,50 +35,61 @@
     </script>
     
     <style>
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #020617; 
-            margin: 0;
-            overflow-x: hidden;
-        }
-
-        /* 3D Canvas Background */
-        #dna-canvas {
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; }
+        
+        /* 3D Canvas Layer */
+        #hero-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
+            z-index: 0; /* Behind everything */
             pointer-events: none;
         }
 
-        /* Glassmorphism Classes */
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.7);
+        /* Glassmorphism Navigation */
+        .glass-nav {
+            background: rgba(2, 6, 23, 0.8); /* Match dark-900 with opacity */
             backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.15);
         }
 
-        /* Animation Hooks */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
         .reveal {
             opacity: 0;
             transform: translateY(30px);
             transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .reveal.visible {
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* Carousel Logic */
+        .carousel-item {
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            position: absolute;
+            inset: 0;
+        }
+        .carousel-item.active {
             opacity: 1;
-            transform: translateY(0);
+            position: relative;
         }
 
         .typing-cursor {
             display: inline-block;
-            width: 2px;
-            height: 0.9em;
+            width: 3px;
+            height: 1.1em;
             background-color: #10b981;
-            animation: blink 0.8s infinite;
+            animation: blink 1s infinite;
             margin-left: 4px;
+            position: relative;
+            top: 0.15em;
         }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
@@ -89,209 +101,194 @@
     </style>
 </head>
 
-<body class="text-slate-300 antialiased">
+<body class="text-light-200 overflow-x-hidden">
 
-    <!-- 3D DNA Interaction Layer -->
-    <canvas id="dna-canvas"></canvas>
+    <!-- 3D Visualization Layer -->
+    <canvas id="hero-canvas"></canvas>
 
-    <!-- Header -->
-    <header class="fixed top-0 w-full z-[100] glass-panel border-b border-white/5">
+    <!-- Header & Navigation -->
+    <header class="fixed top-0 w-full z-[100] glass-nav">
         <nav class="container mx-auto px-6 h-20 flex justify-between items-center">
-            <a href="#" class="text-xl font-bold text-white tracking-tighter flex items-center gap-3">
-                <div class="w-10 h-10 bg-accent/20 border border-accent/40 rounded-xl flex items-center justify-center text-accent">
-                    <i class='bx bx-dna animate-pulse'></i>
-                </div>
-                <span>Alishba <span class="text-accent">Ikram</span></span>
+            <a href="#" class="text-xl font-bold text-white tracking-tight flex items-center gap-2 group">
+                <span class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-dark-900 text-sm font-bold group-hover:rotate-12 transition-transform">AI</span>
+                Alishba <span class="text-primary">Ikram</span>
             </a>
             
-            <div class="hidden md:flex items-center space-x-8 text-sm font-medium">
-                <a href="#about" class="hover:text-accent transition-colors">Journey</a>
-                <a href="#skills" class="hover:text-accent transition-colors">Skills</a>
-                <a href="#projects" class="hover:text-accent transition-colors">Practice</a>
-                <a href="#education" class="hover:text-accent transition-colors">Academic</a>
-                <a href="#contact" class="px-5 py-2.5 bg-accent/10 text-accent border border-accent/20 rounded-full hover:bg-accent hover:text-dark-bg transition-all">Connect</a>
+            <div class="hidden md:flex space-x-10 items-center">
+                <a href="#about" class="text-sm font-mono text-light-200 hover:text-primary transition">About</a>
+                <a href="#skills" class="text-sm font-mono text-light-200 hover:text-primary transition">Skills</a>
+                <a href="#projects" class="text-sm font-mono text-light-200 hover:text-primary transition">Projects</a>
+                <a href="#experience" class="text-sm font-mono text-light-200 hover:text-primary transition">Education</a>
+                <a href="#contact" class="px-6 py-2 bg-primary/10 text-primary border border-primary/30 rounded-full hover:bg-primary hover:text-dark-900 transition-all text-sm font-mono font-bold">Contact</a>
             </div>
 
-            <button id="menu-toggle" class="md:hidden text-2xl text-white">
+            <button id="mobile-menu-btn" class="md:hidden text-3xl text-white">
                 <i class='bx bx-menu-alt-right'></i>
             </button>
         </nav>
     </header>
 
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="fixed inset-0 z-[90] glass-panel flex-col items-center justify-center gap-8 text-2xl font-bold hidden opacity-0 transition-opacity">
-        <a href="#about" class="mobile-link">Journey</a>
-        <a href="#skills" class="mobile-link">Skills</a>
-        <a href="#projects" class="mobile-link">Practice</a>
-        <a href="#contact" class="mobile-link text-accent">Connect</a>
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 z-[90] glass-nav flex-col items-center justify-center space-y-8 text-2xl hidden transition-all">
+        <a href="#about" class="nav-link-mobile">About</a>
+        <a href="#skills" class="nav-link-mobile">Skills</a>
+        <a href="#projects" class="nav-link-mobile">Projects</a>
+        <a href="#experience" class="nav-link-mobile">Education</a>
+        <a href="#contact" class="nav-link-mobile text-primary">Contact</a>
     </div>
 
-    <main class="relative z-10">
+    <!-- Main Content with padding-top to account for fixed header -->
+    <main class="container mx-auto px-6 pt-20 relative z-10">
+
         <!-- Hero Section -->
-        <section id="about" class="min-h-screen flex items-center pt-20">
-            <div class="container mx-auto px-6">
-                <div class="max-w-3xl reveal">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-mono mb-8">
-                        <span class="relative flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
-                        </span>
-                        Learning & Building in Bioinformatics
-                    </div>
-                    
-                    <h1 class="text-5xl md:text-8xl font-extrabold text-white leading-[1.1] mb-6 tracking-tight">
-                        Decoding the <br/>
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-sky-400">Biological Logic.</span>
-                    </h1>
-                    
-                    <p class="text-2xl md:text-3xl font-medium text-slate-400 mb-8">
-                        Student exploring <span id="typing-text" class="text-white"></span><span class="typing-cursor"></span>
-                    </p>
-                    
-                    <p class="text-slate-400 text-lg max-w-xl leading-relaxed mb-10">
-                        I am currently studying Bioinformatics at <span class="text-white font-semibold">GCU Faisalabad</span>. 
-                        My journey involves bridging the gap between biological data and computational algorithms through code and curiosity.
-                    </p>
-                    
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="#projects" class="px-8 py-4 bg-accent text-dark-bg font-bold rounded-2xl flex items-center justify-center gap-2 hover:scale-105 transition-all shadow-xl shadow-accent/20">
-                            Explore Projects <i class='bx bx-right-arrow-alt text-xl'></i>
-                        </a>
-                        <a href="#education" class="px-8 py-4 glass-panel text-white font-bold rounded-2xl border border-white/10 hover:bg-white/5 transition-all text-center">
-                            My Education
-                        </a>
-                    </div>
+        <section id="about" class="min-h-[calc(100vh-5rem)] flex items-center">
+            <div class="max-w-4xl reveal py-12">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] uppercase font-mono tracking-widest mb-6">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                    </span>
+                    Student & Aspiring Bioinformatician
+                </div>
+                
+                <h1 class="text-6xl md:text-8xl font-extrabold text-white leading-[1.1] mb-4 tracking-tighter">
+                    Alishba Ikram.
+                </h1>
+                
+                <h2 class="text-3xl md:text-5xl font-bold text-light-200/90 leading-tight">
+                    Learning to build <br class="md:hidden" />
+                    <span id="typing-text" class="text-primary"></span><span class="typing-cursor"></span>
+                </h2>
+                
+                <p class="text-light-200/60 max-w-2xl mt-8 text-lg md:text-xl leading-relaxed">
+                    I am a student at <span class="text-white font-semibold">GCU Faisalabad</span> exploring the intersection of bioinformatics and computer science. Currently focusing on how large-scale biological data can be decoded through optimized algorithms.
+                </p>
+                
+                <div class="mt-12 flex flex-wrap gap-5">
+                    <a href="#projects" class="px-10 py-4 bg-primary text-dark-900 font-bold rounded-2xl hover:scale-105 transition-all shadow-xl shadow-primary/20">
+                        Explore My Work
+                    </a>
+                    <a href="#contact" class="px-10 py-4 bg-white/5 backdrop-blur-md text-white font-bold rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
+                        Let's Talk
+                    </a>
                 </div>
             </div>
         </section>
 
         <!-- Skills Section -->
-        <section id="skills" class="py-32">
-            <div class="container mx-auto px-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Skill Card 1 -->
-                    <div class="p-8 glass-panel rounded-3xl reveal group hover:border-accent/40 transition-all">
-                        <div class="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center text-accent text-3xl mb-6 group-hover:scale-110 transition-transform">
-                            <i class='bx bx-dna'></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-4">Bioinformatics Base</h3>
-                        <p class="text-slate-400 text-sm mb-6 leading-relaxed">Focusing on DNA sequence analysis, K-mer indexing, and genetic variation detection tools.</p>
-                        <div class="flex flex-wrap gap-2 text-[10px] font-mono uppercase tracking-wider">
-                            <span class="px-3 py-1 bg-white/5 rounded-full border border-white/10">Genomics</span>
-                            <span class="px-3 py-1 bg-white/5 rounded-full border border-white/10">BWA Aligner</span>
-                            <span class="px-3 py-1 bg-white/5 rounded-full border border-white/10">K-mer</span>
-                        </div>
+        <section id="skills" class="py-24">
+            <div class="flex items-center mb-16 reveal">
+                <h2 class="text-3xl font-bold text-white tracking-tight">Learning Stack</h2>
+                <div class="h-[1px] bg-white/10 flex-grow ml-8"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-8 rounded-[2rem] glass-card hover:border-primary/40 transition-all reveal group">
+                    <div class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary text-3xl mb-6 group-hover:scale-110 transition">
+                        <i class='bx bx-dna'></i>
                     </div>
+                    <h3 class="text-xl font-bold text-white mb-4">Bioinformatics Base</h3>
+                    <ul class="text-light-200/50 space-y-3 font-mono text-sm">
+                        <li><i class='bx bx-check-circle text-primary mr-2'></i> K-mer Matching Engine</li>
+                        <li><i class='bx bx-check-circle text-primary mr-2'></i> Sequence Logic</li>
+                        <li><i class='bx bx-check-circle text-primary mr-2'></i> BWA Aligner Setup</li>
+                    </ul>
+                </div>
 
-                    <!-- Skill Card 2 -->
-                    <div class="p-8 glass-panel rounded-3xl reveal group hover:border-sky-400/40 transition-all">
-                        <div class="w-14 h-14 bg-sky-400/10 rounded-2xl flex items-center justify-center text-sky-400 text-3xl mb-6 group-hover:scale-110 transition-transform">
-                            <i class='bx bx-code-block'></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-4">Development</h3>
-                        <p class="text-slate-400 text-sm mb-6 leading-relaxed">Building backend logic and simple web interfaces to visualize biological data results.</p>
-                        <div class="flex flex-wrap gap-2 text-[10px] font-mono uppercase tracking-wider text-sky-400">
-                            <span class="px-3 py-1 bg-white/5 rounded-full border border-white/10">Python</span>
-                            <span class="px-3 py-1 bg-white/5 rounded-full border border-white/10">PHP / SQL</span>
-                            <span class="px-3 py-1 bg-white/5 rounded-full border border-white/10">Tailwind</span>
-                        </div>
+                <div class="p-8 rounded-[2rem] glass-card hover:border-primary/40 transition-all reveal group">
+                    <div class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary text-3xl mb-6 group-hover:scale-110 transition">
+                        <i class='bx bx-code-alt'></i>
                     </div>
+                    <h3 class="text-xl font-bold text-white mb-4">Development</h3>
+                    <ul class="text-light-200/50 space-y-3 font-mono text-sm">
+                        <li><i class='bx bx-check-circle text-primary mr-2'></i> Python (Pandas/NumPy)</li>
+                        <li><i class='bx bx-check-circle text-primary mr-2'></i> PHP & MySQL Backend</li>
+                        <li><i class='bx bx-check-circle text-primary mr-2'></i> Modern Tailwind CSS</li>
+                    </ul>
+                </div>
 
-                    <!-- Skill Card 3 -->
-                    <div class="p-8 glass-panel rounded-3xl reveal group hover:border-purple-400/40 transition-all">
-                        <div class="w-14 h-14 bg-purple-400/10 rounded-2xl flex items-center justify-center text-purple-400 text-3xl mb-6 group-hover:scale-110 transition-transform">
-                            <i class='bx bx-data'></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-4">Database Systems</h3>
-                        <p class="text-slate-400 text-sm mb-6 leading-relaxed">Studying relational database management and optimized data retrieval for large datasets.</p>
-                        <div class="flex flex-wrap gap-2 text-[10px] font-mono uppercase tracking-wider text-purple-400">
-                            <span class="px-3 py-1 bg-white/5 rounded-full border border-white/10">DBMS</span>
-                            <span class="px-3 py-1 bg-white/5 rounded-full border border-white/10">MySQL</span>
-                            <span class="px-3 py-1 bg-white/5 rounded-full border border-white/10">Analysis</span>
-                        </div>
+                <div class="p-8 rounded-[2rem] glass-card hover:border-primary/40 transition-all reveal group">
+                    <div class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary text-3xl mb-6 group-hover:scale-110 transition">
+                        <i class='bx bx-data'></i>
                     </div>
+                    <h3 class="text-xl font-bold text-white mb-4">Database Study</h3>
+                    <ul class="text-light-200/50 space-y-3 font-mono text-sm">
+                        <li><i class='bx bx-check-circle text-primary mr-2'></i> DBMS Architecture</li>
+                        <li><i class='bx bx-check-circle text-primary mr-2'></i> SQL Optimization</li>
+                        <li><i class='bx bx-check-circle text-primary mr-2'></i> Data Visualization</li>
+                    </ul>
                 </div>
             </div>
         </section>
 
-        <!-- Practice Projects -->
+        <!-- Practice Projects Section -->
         <section id="projects" class="py-24">
-            <div class="container mx-auto px-6">
-                <h2 class="text-3xl font-bold text-white mb-16 flex items-center gap-4 reveal">
-                    Practice Lab <span class="h-[1px] bg-white/10 flex-grow"></span>
-                </h2>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <div class="reveal">
-                        <div class="group relative aspect-video rounded-3xl overflow-hidden glass-panel mb-8">
-                            <div class="absolute inset-0 bg-gradient-to-br from-accent/20 to-transparent flex items-center justify-center">
-                                <i class='bx bx-file-find text-8xl text-accent/20 group-hover:scale-110 transition-transform'></i>
+            <div class="flex items-center mb-20 reveal">
+                <h2 class="text-3xl font-bold text-white tracking-tight">Practice Lab</h2>
+                <div class="h-[1px] bg-white/10 flex-grow ml-8"></div>
+            </div>
+            
+            <div class="space-y-40">
+                <!-- Project 1 -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center reveal">
+                    <div class="lg:col-span-7 relative group">
+                        <div class="absolute -inset-4 bg-primary/10 rounded-[2.5rem] blur-3xl opacity-0 group-hover:opacity-100 transition-all"></div>
+                        <div class="relative glass-card rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl aspect-[16/10]">
+                            <div id="genetics-carousel" class="w-full h-full relative">
+                                <div class="carousel-item active"><img src="mutation analysis app.png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="mutation analysis app 1.png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="mutation analysis app 2.png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="mutation analysis app 3.png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="mutation analysis app 4.png" class="w-full h-full object-cover"></div>
                             </div>
-                            <div class="absolute top-6 left-6 px-4 py-1 glass-panel rounded-full text-xs font-mono text-accent">Genomics Task</div>
-                        </div>
-                        <h3 class="text-2xl font-bold text-white mb-4">Gene-ius Identification Hub</h3>
-                        <p class="text-slate-400 leading-relaxed mb-6">A student project implementing a hybrid identification system for DNA snippets using K-mer Indexing logic.</p>
-                        <div class="flex gap-4 font-mono text-xs text-accent">
-                            <span>Python</span><span>BWA Aligner</span><span>PHP</span>
+                            <div class="absolute top-6 left-6 bg-dark-900/80 backdrop-blur-md px-5 py-2 rounded-full border border-primary/20 text-xs font-mono text-primary font-bold">
+                                Task: <span id="genetics-label">Main Dashboard</span>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="reveal">
-                        <div class="group relative aspect-video rounded-3xl overflow-hidden glass-panel mb-8">
-                            <div class="absolute inset-0 bg-gradient-to-br from-sky-400/20 to-transparent flex items-center justify-center">
-                                <i class='bx bx-cloud-lightning text-8xl text-sky-400/20 group-hover:scale-110 transition-transform'></i>
-                            </div>
-                            <div class="absolute top-6 left-6 px-4 py-1 glass-panel rounded-full text-xs font-mono text-sky-400">Data Task</div>
+                    <div class="lg:col-span-5">
+                        <span class="text-primary font-mono text-sm block mb-4">Bioinformatics Study</span>
+                        <h3 class="text-3xl font-bold text-white mb-6">Gene-ius Hub Pipeline</h3>
+                        <div class="p-8 glass-card rounded-[2rem] border-l-4 border-primary mb-8 text-light-200/70">
+                            <p class="mb-4 text-sm leading-relaxed italic"><strong class="text-primary font-bold">Goal:</strong> Practicing building a hybrid system with <span class="text-white font-bold">K-mer Indexing</span> for sub-second gene identification within snippets.</p>
+                            <p class="text-sm">Explores the use of PHP and Python to bridge database queries with biological analysis scripts.</p>
                         </div>
-                        <h3 class="text-2xl font-bold text-white mb-4">Agro-Forecast Strategy Tool</h3>
-                        <p class="text-slate-400 leading-relaxed mb-6">Building a predictive dashboard that combines weather API data with soil properties to suggest crop strategies.</p>
-                        <div class="flex gap-4 font-mono text-xs text-sky-400">
-                            <span>Streamlit</span><span>API Integration</span><span>Pandas</span>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="px-4 py-1.5 bg-white/5 rounded-full text-xs font-mono border border-white/10">Python</span>
+                            <span class="px-4 py-1.5 bg-white/5 rounded-full text-xs font-mono border border-white/10">BWA</span>
+                            <span class="px-4 py-1.5 bg-white/5 rounded-full text-xs font-mono border border-white/10">MySQL</span>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- Education -->
-        <section id="education" class="py-24">
-            <div class="container mx-auto px-6">
-                <div class="max-w-4xl mx-auto glass-panel rounded-[2rem] p-12 reveal">
-                    <h2 class="text-3xl font-bold text-white mb-12 text-center">My Learning Path</h2>
-                    
-                    <div class="space-y-12">
-                        <div class="flex gap-8 relative">
-                            <div class="flex flex-col items-center">
-                                <div class="w-4 h-4 rounded-full bg-accent shadow-[0_0_15px_#10b981]"></div>
-                                <div class="w-0.5 h-full bg-white/5 mt-2"></div>
-                            </div>
-                            <div>
-                                <span class="text-accent font-mono text-xs mb-1 block">2024 - 2028</span>
-                                <h4 class="text-xl font-bold text-white">BS Bioinformatics</h4>
-                                <p class="text-slate-400">Government College University Faisalabad (GCUF)</p>
-                            </div>
+                <!-- Project 2 -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center reveal">
+                    <div class="lg:col-span-5 order-2 lg:order-1">
+                        <span class="text-primary font-mono text-sm block mb-4">Data Analysis Study</span>
+                        <h3 class="text-3xl font-bold text-white mb-6">Smart Crop Management</h3>
+                        <div class="p-8 glass-card rounded-[2rem] border-l-4 border-primary mb-8 text-light-200/70">
+                            <p class="mb-4 text-sm leading-relaxed italic"><strong class="text-primary font-bold">Goal:</strong> Integrating <span class="text-white font-bold">OpenWeather API</span> to suggest crop strategies based on soil thermal properties.</p>
+                            <p class="text-sm">A practice in using Streamlit to create interactive dashboards for complex environmental data.</p>
                         </div>
-
-                        <div class="flex gap-8 relative">
-                            <div class="flex flex-col items-center">
-                                <div class="w-4 h-4 rounded-full bg-sky-400 shadow-[0_0_15px_#38bdf8]"></div>
-                                <div class="w-0.5 h-full bg-white/5 mt-2"></div>
-                            </div>
-                            <div>
-                                <span class="text-sky-400 font-mono text-xs mb-1 block">2025 - 2027</span>
-                                <h4 class="text-xl font-bold text-white">Associate Degree in DBMS</h4>
-                                <p class="text-slate-400">Virtual University of Pakistan</p>
-                            </div>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="px-4 py-1.5 bg-white/5 rounded-full text-xs font-mono border border-white/10">Streamlit</span>
+                            <span class="px-4 py-1.5 bg-white/5 rounded-full text-xs font-mono border border-white/10">Pandas</span>
+                            <span class="px-4 py-1.5 bg-white/5 rounded-full text-xs font-mono border border-white/10">Python</span>
                         </div>
-
-                        <div class="flex gap-8">
-                            <div class="flex flex-col items-center">
-                                <div class="w-4 h-4 rounded-full bg-slate-600"></div>
+                    </div>
+                    <div class="lg:col-span-7 relative group order-1 lg:order-2">
+                        <div class="absolute -inset-4 bg-primary/10 rounded-[2.5rem] blur-3xl opacity-0 group-hover:opacity-100 transition-all"></div>
+                        <div class="relative glass-card rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl aspect-[16/10]">
+                            <div id="crop-carousel" class="w-full h-full relative">
+                                <div class="carousel-item active"><img src="crop analysis app..png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="crop analysis app.1.png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="crop analysis app.2.png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="crop analysis app.3.png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="crop analysis app.4.png" class="w-full h-full object-cover"></div>
+                                <div class="carousel-item"><img src="crop analysis app.5.png" class="w-full h-full object-cover"></div>
                             </div>
-                            <div>
-                                <span class="text-slate-500 font-mono text-xs mb-1 block">2021 - 2023</span>
-                                <h4 class="text-xl font-bold text-white">Intermediate (Computer Science)</h4>
-                                <p class="text-slate-400">BISE Faisalabad</p>
+                            <div class="absolute top-6 right-6 bg-dark-900/80 backdrop-blur-md px-5 py-2 rounded-full border border-primary/20 text-xs font-mono text-primary font-bold">
+                                Task: <span id="crop-label">Weather Forecast</span>
                             </div>
                         </div>
                     </div>
@@ -299,115 +296,141 @@
             </div>
         </section>
 
-        <!-- Contact -->
-        <section id="contact" class="py-32">
-            <div class="container mx-auto px-6 text-center reveal">
-                <div class="inline-block p-4 bg-accent/10 rounded-3xl text-4xl text-accent mb-8">
-                    <i class='bx bx-paper-plane'></i>
+        <!-- Education Section -->
+        <section id="experience" class="py-24">
+            <div class="flex items-center mb-16 reveal">
+                <h2 class="text-3xl font-bold text-white tracking-tight">Academic Journey</h2>
+                <div class="h-[1px] bg-white/10 flex-grow ml-8"></div>
+            </div>
+            
+            <div class="max-w-4xl mx-auto space-y-12 reveal">
+                <div class="relative pl-12 border-l-2 border-primary/10 py-4">
+                    <div class="absolute -left-[9px] top-6 w-4 h-4 rounded-full bg-primary border-4 border-dark-900 shadow-[0_0_20px_rgba(16,185,129,0.8)]"></div>
+                    <span class="text-primary font-mono text-sm font-bold">2024 - 2028</span>
+                    <h3 class="text-2xl font-bold text-white mt-1">BS Bioinformatics</h3>
+                    <p class="text-light-200/80 font-semibold mb-2 text-lg">GCU Faisalabad (GCUF)</p>
+                    <p class="text-sm text-light-200/40">Exploring genome sequencing and computational tools for life sciences.</p>
                 </div>
-                <h2 class="text-4xl md:text-6xl font-extrabold text-white mb-8 tracking-tighter">Let's start a conversation.</h2>
-                <p class="text-slate-400 text-xl max-w-xl mx-auto mb-12">
-                    Whether it's about genomics, databases, or just to say hi, I'm always open to learning from others.
+
+                <div class="relative pl-12 border-l-2 border-primary/10 py-4">
+                    <div class="absolute -left-[9px] top-6 w-4 h-4 rounded-full bg-primary/30 border-4 border-dark-900"></div>
+                    <span class="text-light-200/40 font-mono text-sm">2025 - 2027</span>
+                    <h3 class="text-2xl font-bold text-white mt-1">Associate Degree in DBMS</h3>
+                    <p class="text-light-200/80 font-semibold mb-2 text-lg">Virtual University of Pakistan</p>
+                    <p class="text-sm text-light-200/40">Specializing in relational databases and SQL architecture.</p>
+                </div>
+
+                <div class="relative pl-12 border-l-2 border-primary/10 py-4">
+                    <div class="absolute -left-[9px] top-6 w-4 h-4 rounded-full bg-primary/10 border-4 border-dark-900"></div>
+                    <span class="text-light-200/40 font-mono text-sm">2021 - 2023</span>
+                    <h3 class="text-2xl font-bold text-white mt-1">Intermediate (CS)</h3>
+                    <p class="text-light-200/80 font-semibold mb-2 text-lg">BISE Faisalabad</p>
+                    <p class="text-sm text-light-200/40">Building foundations in programming and computer logic.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-32 reveal text-center relative">
+            <div class="relative z-10">
+                <div class="w-20 h-20 bg-primary/10 text-primary rounded-3xl flex items-center justify-center text-4xl mx-auto mb-10 shadow-2xl shadow-primary/20">
+                    <i class='bx bx-message-square-detail'></i>
+                </div>
+                <h2 class="text-5xl md:text-7xl font-extrabold text-white mb-8 tracking-tighter">Let's connect.</h2>
+                <p class="text-light-200/60 max-w-xl mx-auto mb-14 text-lg">
+                    I'm always eager to collaborate on learning projects or discuss new research in bioinformatics. Drop me a line!
                 </p>
-                <a href="mailto:ikramalishba991@gmail.com" class="inline-flex items-center gap-4 px-12 py-5 bg-white text-dark-bg font-bold rounded-2xl hover:bg-accent hover:text-dark-bg transition-all text-xl">
-                    Say Hello <i class='bx bx-right-arrow-alt'></i>
-                </a>
-                <div class="mt-16 flex justify-center gap-8 text-slate-500 text-sm font-mono">
-                    <span>Faisalabad, PK</span>
-                    <span>Learner @ GCUF</span>
+                <div class="flex flex-col items-center gap-10">
+                    <a href="mailto:ikramalishba991@gmail.com" class="text-2xl md:text-4xl font-bold text-white hover:text-primary transition-all underline decoration-primary/20 underline-offset-[12px] hover:decoration-primary">
+                        ikramalishba991@gmail.com
+                    </a>
+                    <div class="flex gap-6 mt-6">
+                        <a href="#" class="w-16 h-16 glass-card rounded-3xl flex items-center justify-center text-3xl hover:text-primary hover:-translate-y-1 transition-all"><i class='bx bxl-github'></i></a>
+                        <a href="#" class="w-16 h-16 glass-card rounded-3xl flex items-center justify-center text-3xl hover:text-primary hover:-translate-y-1 transition-all"><i class='bx bxl-linkedin'></i></a>
+                    </div>
                 </div>
             </div>
         </section>
+
     </main>
 
-    <footer class="py-12 border-t border-white/5 relative z-10">
-        <div class="container mx-auto px-6 text-center text-slate-600 text-sm font-mono">
-            &copy; 2026 Alishba Ikram | Handcrafted for Science
-        </div>
+    <footer class="py-12 border-t border-white/5 text-center text-sm font-mono text-light-200/30">
+        &copy; 2026 Alishba Ikram | Crafted for Science & Technology
     </footer>
 
     <script>
-        // --- 3D DNA SCENE (THREE.JS) ---
+        // --- 3D DNA ENGINE ---
         let scene, camera, renderer, helixGroup, particles;
 
         function init3D() {
-            const canvas = document.getElementById('dna-canvas');
+            const canvas = document.getElementById('hero-canvas');
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
             helixGroup = new THREE.Group();
             
-            // Create Helix
-            const curvePoints = 50;
-            const helixRadius = 15;
-            const helixHeight = 150;
-            const sphereGeom = new THREE.SphereGeometry(0.6, 16, 16);
-            const emeraldMat = new THREE.MeshPhongMaterial({ color: 0x10b981, emissive: 0x10b981, emissiveIntensity: 0.5 });
-            const skyMat = new THREE.MeshPhongMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 0.5 });
-            const connectorMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.1 });
+            const pointsCount = 50;
+            const helixRadius = 14;
+            const sphereGeom = new THREE.SphereGeometry(0.5, 12, 12);
+            const primaryMat = new THREE.MeshPhongMaterial({ color: 0x10b981, emissive: 0x10b981, emissiveIntensity: 0.6 });
+            const secondaryMat = new THREE.MeshPhongMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 0.4 });
 
-            for (let i = 0; i < curvePoints; i++) {
-                const y = (i / curvePoints) * helixHeight - helixHeight / 2;
-                const angle = (i / curvePoints) * Math.PI * 6;
+            for (let i = 0; i < pointsCount; i++) {
+                const y = (i - pointsCount / 2) * 4.5;
+                const angle = i * 0.45;
 
                 // Strand 1
                 const x1 = Math.cos(angle) * helixRadius;
                 const z1 = Math.sin(angle) * helixRadius;
-                const sphere1 = new THREE.Mesh(sphereGeom, emeraldMat);
-                sphere1.position.set(x1, y, z1);
-                helixGroup.add(sphere1);
+                const s1 = new THREE.Mesh(sphereGeom, primaryMat);
+                s1.position.set(x1, y, z1);
+                helixGroup.add(s1);
 
                 // Strand 2
                 const x2 = Math.cos(angle + Math.PI) * helixRadius;
                 const z2 = Math.sin(angle + Math.PI) * helixRadius;
-                const sphere2 = new THREE.Mesh(sphereGeom, skyMat);
-                sphere2.position.set(x2, y, z2);
-                helixGroup.add(sphere2);
+                const s2 = new THREE.Mesh(sphereGeom, secondaryMat);
+                s2.position.set(x2, y, z2);
+                helixGroup.add(s2);
 
-                // Connectors (Base Pairs)
+                // Connector Bases
                 if (i % 2 === 0) {
-                    const lineGeom = new THREE.CylinderGeometry(0.1, 0.1, helixRadius * 2);
-                    const line = new THREE.Mesh(lineGeom, connectorMat);
+                    const lineGeom = new THREE.CylinderGeometry(0.12, 0.12, helixRadius * 2);
+                    const line = new THREE.Mesh(lineGeom, new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.15 }));
                     line.position.set(0, y, 0);
                     line.rotation.z = Math.PI / 2;
                     line.rotation.y = angle;
                     helixGroup.add(line);
                 }
             }
-
             scene.add(helixGroup);
 
-            // Particle Field
-            const pCount = 500;
+            // Particle Genomic Fog
+            const pCount = 1000;
             const pGeom = new THREE.BufferGeometry();
             const pPos = new Float32Array(pCount * 3);
-            for (let i = 0; i < pCount * 3; i++) {
-                pPos[i] = (Math.random() - 0.5) * 400;
-            }
+            for (let i = 0; i < pCount * 3; i++) pPos[i] = (Math.random() - 0.5) * 600;
             pGeom.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-            const pMat = new THREE.PointsMaterial({ color: 0x10b981, size: 0.5, transparent: true, opacity: 0.3 });
-            particles = new THREE.Points(pGeom, pMat);
+            particles = new THREE.Points(pGeom, new THREE.PointsMaterial({ color: 0x10b981, size: 0.5, transparent: true, opacity: 0.3 }));
             scene.add(particles);
 
-            // Lights
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-            scene.add(ambientLight);
-            const pointLight = new THREE.PointLight(0x10b981, 1);
-            pointLight.position.set(20, 20, 20);
-            scene.add(pointLight);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+            const pLight = new THREE.PointLight(0x10b981, 1.5);
+            pLight.position.set(40, 40, 40);
+            scene.add(pLight);
 
-            camera.position.z = 100;
+            camera.position.z = 130;
             animate();
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            helixGroup.rotation.y += 0.005;
-            helixGroup.rotation.x += 0.002;
-            particles.rotation.y -= 0.0005;
+            helixGroup.rotation.y += 0.006;
+            helixGroup.rotation.x += 0.001;
+            particles.rotation.y -= 0.0002;
             renderer.render(scene, camera);
         }
 
@@ -417,51 +440,55 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // Mouse interaction
-        document.addEventListener('mousemove', (e) => {
-            const x = (e.clientX / window.innerWidth - 0.5) * 2;
-            const y = (e.clientY / window.innerHeight - 0.5) * 2;
-            helixGroup.rotation.z = x * 0.1;
-            helixGroup.position.x = x * 5;
-        });
+        // --- TYPING INTERFACE ---
+        function initTyping() {
+            const el = document.getElementById('typing-text');
+            const phrases = ["Bioinformatics Tools.", "Data Analysis Apps.", "Scientific Logic.", "Database Systems."];
+            let i = 0, j = 0, deleting = false;
 
-        // --- TYPING ANIMATION ---
-        const typingText = document.getElementById('typing-text');
-        const phrases = ["Bioinformatics Tools.", "Genomic Data.", "DBMS Structures.", "Scientific Coding."];
-        let i = 0, j = 0, isDeleting = false;
-
-        function type() {
-            const current = phrases[i];
-            typingText.textContent = isDeleting ? current.substring(0, j-1) : current.substring(0, j+1);
-            j = isDeleting ? j - 1 : j + 1;
-            if (!isDeleting && j === current.length) { setTimeout(() => isDeleting = true, 2000); }
-            else if (isDeleting && j === 0) { isDeleting = false; i = (i + 1) % phrases.length; }
-            setTimeout(type, isDeleting ? 50 : 150);
+            function type() {
+                const current = phrases[i];
+                el.textContent = deleting ? current.substring(0, j-1) : current.substring(0, j+1);
+                j = deleting ? j - 1 : j + 1;
+                if (!deleting && j === current.length) { setTimeout(() => deleting = true, 2500); }
+                else if (deleting && j === 0) { deleting = false; i = (i + 1) % phrases.length; }
+                setTimeout(type, deleting ? 50 : 150);
+            }
+            type();
         }
 
-        // --- REVEAL ON SCROLL ---
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+        // --- CAROUSEL INTERFACE ---
+        function initCarousel(id, labelId, labels) {
+            const items = document.querySelectorAll(`#${id} .carousel-item`);
+            const label = document.getElementById(labelId);
+            let cur = 0;
+            setInterval(() => {
+                items[cur].classList.remove('active');
+                cur = (cur + 1) % items.length;
+                items[cur].classList.add('active');
+                if(label) label.textContent = labels[cur];
+            }, 4500);
+        }
+
+        // --- REVEAL ENGINE ---
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible') });
         }, { threshold: 0.1 });
 
         window.onload = () => {
             init3D();
-            type();
+            initTyping();
+            initCarousel('genetics-carousel', 'genetics-label', ["Main Dashboard", "Mutation View", "Gene Search", "New Entry Form", "AI Report Output"]);
+            initCarousel('crop-carousel', 'crop-label', ["Weather Dashboard", "Weekly Forecast", "Soil Analysis", "Suitability Score", "Risk Management", "Comparison Tool"]);
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
             
-            // Mobile Menu
-            const menuToggle = document.getElementById('menu-toggle');
-            const mobileMenu = document.getElementById('mobile-menu');
-            menuToggle.onclick = () => {
-                const hidden = mobileMenu.classList.contains('hidden');
-                if(hidden) {
-                    mobileMenu.classList.replace('hidden', 'flex');
-                    setTimeout(() => mobileMenu.classList.remove('opacity-0'), 10);
-                } else {
-                    mobileMenu.classList.add('opacity-0');
-                    setTimeout(() => mobileMenu.classList.replace('flex', 'hidden'), 300);
-                }
-            };
+            // Mobile Menu Controller
+            const btn = document.getElementById('mobile-menu-btn');
+            const menu = document.getElementById('mobile-menu');
+            const links = document.querySelectorAll('.nav-link-mobile');
+            
+            btn.onclick = () => menu.classList.toggle('hidden');
+            links.forEach(l => l.onclick = () => menu.classList.add('hidden'));
         };
     </script>
 </body>
